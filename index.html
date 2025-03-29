@@ -107,7 +107,7 @@
             chatBox.scrollTop = chatBox.scrollHeight;
             
             try {
-                const response = await fetch(`https://api-ehsan-gpt4.onrender.com/ehsan/g?q=${encodeURIComponent(message)}&userId=12345&network=true&withoutContext=false&stream=true&license=YOUR_LICENSE_KEY`);
+                const response = await fetch(`https://api-ehsan-gpt4.onrender.com/ehsan/g?q=${encodeURIComponent(message)}&userId=12345&network=true&withoutContext=false&stream=true&license=Kj5uZTgzkEmgZk5Fi3ev2RiSB0p63k1p8L8deWs9l34g`);
                 const data = await response.json();
                 
                 const botMessage = document.createElement("div");
