@@ -197,7 +197,7 @@
                         "stream": false
                     })
                 });
-                const data = await response.json();
+                const data = await response.text();
                 botMessage.textContent = data.message || "No response";
             } catch (error) {
                 botMessage.textContent = "Failed to fetch response";
