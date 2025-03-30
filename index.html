@@ -179,8 +179,14 @@
                 const response = await fetch("https://api.binjie.fun/api/generateStream", {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json",
+                        "authority": "api.binjie.fun",
                         "accept": "application/json, text/plain, */*",
+                        "accept-encoding": "gzip, deflate, br",
+                        "accept-language": "en-US,en;q=0.9",
+                        "origin": "https://chat18.aichatos.xyz",
+                        "referer": "https://chat18.aichatos.xyz/",
+                        "user-agent": "Mozilla/5.0",
+                        "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
                         "prompt": message,
@@ -188,7 +194,7 @@
                         "network": true,
                         "system": "",
                         "withoutContext": false,
-                        "stream": false
+                        "stream": true
                     })
                 });
                 const data = await response.json();
