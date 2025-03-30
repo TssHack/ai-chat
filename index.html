@@ -53,24 +53,6 @@
             background-color: #333;
             box-shadow: 0 0 10px #555;
         }
-        .delete-btn {
-            position: absolute;
-            top: 50%;
-            right: -25px;
-            transform: translateY(-50%);
-            background: red;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            display: none;
-            transition: 0.3s;
-        }
-        .message:hover .delete-btn {
-            display: block;
-        }
         .input-container {
             display: flex;
             padding: 12px;
@@ -128,51 +110,34 @@
     </div>
     
     <script>
-        function generateUserId() {
-            return Math.floor(Math.random() * 1000000000).toString();
-        }
-
-        let userId = generateUserId();
-        const chatBox = document.getElementById("chat-box");
-
         function saveChat() {
-            localStorage.setItem("chatHistory", chatBox.innerHTML);
-            localStorage.setItem("userId", userId);
+            localStorage.setItem("chatHistory", document.getElementById("chat-box").innerHTML);
         }
 
         function loadChat() {
             const savedChat = localStorage.getItem("chatHistory");
-            if (savedChat) chatBox.innerHTML = savedChat;
-        }
-
-        function deleteMessage(event) {
-            event.target.parentElement.remove();
-            saveChat();
+            if (savedChat) document.getElementById("chat-box").innerHTML = savedChat;
         }
 
         function newChat() {
-            chatBox.innerHTML = "";
-            userId = generateUserId();
+            document.getElementById("chat-box").innerHTML = "";
             saveChat();
         }
 
         async function sendMessage() {
             const inputField = document.getElementById("user-input");
-            const message = inputField.value;
+            const message = inputField.value.trim();
             if (!message) return;
             
-            const userMessage = document.createElement("div");
-            userMessage.classList.add("message", "user");
-            userMessage.textContent = message;
-            
-            chatBox.appendChild(userMessage);
+            const chatBox = document.getElementById("chat-box");
+            const userMessage = `<div class="message user">${message}</div>`;
+            chatBox.innerHTML += userMessage;
             inputField.value = "";
             chatBox.scrollTop = chatBox.scrollHeight;
             saveChat();
             
-            const botMessage = document.createElement("div");
-            botMessage.classList.add("message", "bot");
-            chatBox.appendChild(botMessage);
+            const botTyping = `<div class="message bot">در حال پردازش...</div>`;
+            chatBox.innerHTML += botTyping;
             saveChat();
             
             try {
@@ -197,10 +162,12 @@
                         "stream": true
                     })
                 });
-                const data = await response.text();
-                botMessage.textContent = data.message || "No response";
+                 const data = await response.json();
+                console.log("API Response:", data);
+                const botReply = `<div class="message bot">${data.result || "No response"}</div>`;
+                chatBox.innerHTML = chatBox.innerHTML.replace(botTyping, botReply);
             } catch (error) {
-                botMessage.textContent = "Failed to fetch response";
+                chatBox.innerHTML = chatBox.innerHTML.replace(botTyping, '<div class="message bot">خطا در دریافت پاسخ</div>');
             }
             saveChat();
         }
