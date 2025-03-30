@@ -85,6 +85,7 @@
             color: white;
             outline: none;
             margin-right: 10px;
+            font-family: 'Arial', sans-serif;
         }
         button {
             padding: 12px 18px;
@@ -97,6 +98,18 @@
         }
         button:hover {
             background-color: #5a1075;
+        }
+        .new-chat-btn {
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #ff9800;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .new-chat-btn:hover {
+            background-color: #e68900;
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -111,27 +124,20 @@
             <input type="text" id="user-input" placeholder="Type a message...">
             <button onclick="sendMessage()">Send</button>
         </div>
+        <button class="new-chat-btn" onclick="newChat()">New Chat</button>
     </div>
     
     <script>
-        async function getUserId() {
-            try {
-                const response = await fetch('https://api64.ipify.org?format=json');
-                const data = await response.json();
-                return data.ip.replace(/\./g, '');
-            } catch (error) {
-                console.error('Failed to fetch IP:', error);
-                return 'unknown';
-            }
+        function generateUserId() {
+            return Math.floor(Math.random() * 1000000000).toString();
         }
 
-        let userId;
-        getUserId().then(id => userId = id);
-        
+        let userId = generateUserId();
         const chatBox = document.getElementById("chat-box");
 
         function saveChat() {
             localStorage.setItem("chatHistory", chatBox.innerHTML);
+            localStorage.setItem("userId", userId);
         }
 
         function loadChat() {
@@ -141,6 +147,12 @@
 
         function deleteMessage(event) {
             event.target.parentElement.remove();
+            saveChat();
+        }
+
+        function newChat() {
+            chatBox.innerHTML = "";
+            userId = generateUserId();
             saveChat();
         }
 
@@ -179,13 +191,7 @@
                     const { value, done } = await reader.read();
                     if (done) break;
                     const chunk = decoder.decode(value, { stream: true });
-                    
-                    try {
-                        const jsonResponse = JSON.parse(chunk);
-                        botMessage.textContent += jsonResponse.response || "Error receiving response";
-                    } catch (err) {
-                        console.error("Parsing error", err);
-                    }
+                    botMessage.textContent += chunk;
                     chatBox.scrollTop = chatBox.scrollHeight;
                     saveChat();
                 }
