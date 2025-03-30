@@ -165,12 +165,6 @@
             userMessage.classList.add("message", "user");
             userMessage.textContent = message;
             
-            const deleteBtn = document.createElement("button");
-            deleteBtn.classList.add("delete-btn");
-            deleteBtn.textContent = "×";
-            deleteBtn.onclick = deleteMessage;
-            userMessage.appendChild(deleteBtn);
-            
             chatBox.appendChild(userMessage);
             inputField.value = "";
             chatBox.scrollTop = chatBox.scrollHeight;
@@ -182,19 +176,23 @@
             saveChat();
             
             try {
-                const response = await fetch(`https://api-ehsan-gpt4.onrender.com/ehsan/g?q=${encodeURIComponent(message)}&userId=${userId}&network=true&withoutContext=false&stream=true&license=Kj5uZTgzkEmgZk5Fi3ev2RiSB0p63k1p8L8deWs9l34g`);
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder();
-                
-                botMessage.textContent = "";
-                while (true) {
-                    const { value, done } = await reader.read();
-                    if (done) break;
-                    const chunk = decoder.decode(value, { stream: true });
-                    botMessage.textContent += chunk;
-                    chatBox.scrollTop = chatBox.scrollHeight;
-                    saveChat();
-                }
+                const response = await fetch("https://api.binjie.fun/api/generateStream", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "accept": "application/json, text/plain, */*",
+                    },
+                    body: JSON.stringify({
+                        "prompt": message,
+                        "userId": userId,
+                        "network": true,
+                        "system": "",
+                        "withoutContext": false,
+                        "stream": false
+                    })
+                });
+                const data = await response.json();
+                botMessage.textContent = data.message || "No response";
             } catch (error) {
                 botMessage.textContent = "Failed to fetch response";
             }
